@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.110.0'
+          extended: true
+      - name: Build
+        run: hugo --minify
+      - name: Pushes to public repo
+        id: push_directory
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+        with:
+          source-directory: public/
+          destination-github-username: 'lynshi'
+          destination-repository-name: 'lynshi.github.io'
+          commit-message: See ORIGIN_COMMIT from $GITHUB_REF
+          target-branch: main
