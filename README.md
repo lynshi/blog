@@ -1,6 +1,7 @@
 # My blogging site
 
 Made with [Hugo](https://gohugo.io/)
+
 Theme: [PaperMod](https://github.com/adityatelange/hugo-PaperMod)
 
 # Getting started
