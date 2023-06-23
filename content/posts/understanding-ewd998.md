@@ -16,17 +16,19 @@ One of the nice things about a college course/lecture is that you get the teache
 
 So, after I spent a good chunk of my time unwrapping this paper, I figured I could throw something onto the Internet to make someone else’s reading a little easier. Read on for what is essentially EWD998 restated with longer explanations where Dijkstra's brevity forced me to stop and think :)
 
+Be warned that the mathematical notation is still around (though I try to also explain it in English). It is a succinct yet clear way to express the ideas, which is rather neat![^1]
+
 ----------------
 
 The premise of the paper is that there’s a circle of $N$ machines indexed from 0. Each machine is either active or passive. Active machines may send messages to other machines. These messages take time to travel between machines; however, no messages are ever lost. An active machine can become passive "spontaneously". Meanwhile, a passive machine only becomes active upon receipt of a message.
 
-We want to figure out when the system is stable; that is, all machines are passive and there are no messages in transit. We’re going to devise a solution where the first machine, $m_0$[^1], can detect when the system has reached a stable state (i.e. termination). This termination detection algorithm is called "the probe".
+We want to figure out when the system is stable; that is, all machines are passive and there are no messages in transit. We’re going to devise a solution where the first machine, $m_0$[^2], can detect when the system has reached a stable state (i.e. termination). This termination detection algorithm is called "the probe".
 
 The machines, regardless of their active/passive status, can always communicate such that:
 1. Machine $m_0$ can kick off the probe by sending a signal (i.e. a _token_) to $m_{N - 1}$.
 2. $m_{i + 1}$ can always propogate the probe by sending the token to $m_{i}$, even if $m_{i + 1}$ is passive.
 
-Eventually, this token makes its way back to $m_0$. Based on information on the token and the state of $m_0$, we'll be able to conclude whether the stable state has been reached[^2].
+Eventually, this token makes its way back to $m_0$. Based on information on the token and the state of $m_0$, we'll be able to conclude whether the stable state has been reached[^3].
 
 ----------
 
@@ -39,11 +41,11 @@ Concretely, we'll
 
 Each edge case can be addressed by adding a new condition to the invariant, so we loop back to 1. When we add a new condition, we have to be careful that the condition still allows us to detect termination.
 
-Based on Dijkstra's closing[^3], this strategy seem to have been discussed for some time, which explains why EWD998 reads so matter-of-factly[^4]. But here I'm telling you up front what to expect, so you don't have to tear your hair out wondering what magic possessed Safra such that the logic moves so effortlessly from step to step!
+Based on Dijkstra's closing[^4], this strategy seem to have been discussed for some time, which explains why EWD998 reads so matter-of-factly[^5]. But here I'm telling you up front what to expect, so you don't have to tear your hair out wondering what magic possessed Safra such that the logic moves so effortlessly from step to step!
 
 -----
 
-Let $t$ be the index of the machine holding the token and $B$ be the number of messages on their way. We would like to determine whether the system has reached stable state when the token returns to $m_0$ (i.e. $t = 0$), and our definitions mean that termination can be stated as[^5]
+Let $t$ be the index of the machine holding the token and $B$ be the number of messages on their way. We would like to determine whether the system has reached stable state when the token returns to $m_0$ (i.e. $t = 0$), and our definitions mean that termination can be stated as[^6]
 $$\forall i \in [0, N): m_i \text{ is passive} \land B = 0$$
 
 In other words, the system is stable if all machines are passive and no messages are on their way (to wake up a machine).
@@ -54,13 +56,13 @@ $$P_0: \quad B = \Sigma_{i = 0}^{N - 1}c_i$$
 
 Intuitively, we want $c_i$ to be the net messages sent by machine $i$, and we enforce this by adding a rule to the system.
 
-> Rule 0: Each machine maintains its own counter $c_i$, incrementing it by 1 when it sends a message and decrementing it by 1 when it receives a message[^6]. It follows that we should initialize all $c_i$ to 0 when the machines first start.
+> Rule 0: Each machine maintains its own counter $c_i$, incrementing it by 1 when it sends a message and decrementing it by 1 when it receives a message[^7]. It follows that we should initialize all $c_i$ to 0 when the machines first start.
 
 $P_0$ doesn't depend on $t$, so $m_0$ receiving the token after it has been sent around the ring doesn't help us determine anything. Consequently, let's say that the token has a value $q$ and add a condition $P_1$.
 
 $$P_1: \quad \forall i \in (t, N): m_i \text{ is passive} \land \Sigma_{i = t + 1}^{N - 1}c_i = q$$
 
-If $P_1$ is true, that means that all machines that have already handled the token are passive, and the sum of their counters $c_i$ is equal to the value of the token. The token being integer-valued and connected to the $c_i$ is critical to the termination detection algorithm as it encodes information about $B$, which is hard to know without an overall view of the system, into something that can be passed around[^7].
+If $P_1$ is true, that means that all machines that have already handled the token are passive, and the sum of their counters $c_i$ is equal to the value of the token. The token being integer-valued and connected to the $c_i$ is critical to the termination detection algorithm as it encodes information about $B$, which is hard to know without an overall view of the system, into something that can be passed around[^8].
 
 Now, our invariant is $P_0 \land P_1$. If the invariant holds, when the token returns at $t = 0$,
 
@@ -181,7 +183,7 @@ Note that the invariant is true when the probe is first started. $P_0$ is always
 Additionally, note that $P_3$ only makes a statement about machines whose index is $t$ or less. As a result, it's always safe to whiten a machine whose index exceeds $t$.
 > Rule 7: After transmitting the token to $m_i$, $m_{i + 1}$ whitens itself.
 
-It follows that when no messages are in-flight ($B = 0$), no machines turn black anymore, all black machines whiten themselves eventually, and the token eventually stays white. When $B=0$ _and_ all machines are passive, every $c_i$ becomes constant because no machine is able to send messages and there are no messages in transit that might decrease some $c_i$. When a probe is started during such a state, $P_1$ stays true throughout the probe. When the probe ends, $c_0 + q = B = 0$. Therefore, all conditions for detecting termination eventually become true after the system becomes passive![^8]
+It follows that when no messages are in-flight ($B = 0$), no machines turn black anymore, all black machines whiten themselves eventually, and the token eventually stays white. When $B=0$ _and_ all machines are passive, every $c_i$ becomes constant because no machine is able to send messages and there are no messages in transit that might decrease some $c_i$. When a probe is started during such a state, $P_1$ stays true throughout the probe. When the probe ends, $c_0 + q = B = 0$. Therefore, all conditions for detecting termination eventually become true after the system becomes passive![^9]
 
 Exhausted? That makes two of us!
 
@@ -195,18 +197,20 @@ So, I'll take this opportunity to note that the workshop was terrific! Many than
 
 [^0]: Ackchyually, I read the [Raft paper](https://raft.github.io/raft.pdf) when I first started working (technically still almost 3 years ago though!) and [Paxos vs Raft: Have we reached consensus on distributed consensus?](https://arxiv.org/pdf/2004.05074.pdf) sometime last year. But they didn’t have any mathematical notation, so my brain didn’t really get fried and therefore it doesn't count.
 
-[^1]: Dijkstra uses the term `nr.i` to refer to machine `i`, but that doesn't look good and is even a little confusing in LaTeX.
+[^1]: After reading this article, Leslie Lamport wrote to say that "math isn't a hinderance to understanding but rather a requirement." I try to be a bit gentler, but I do agree! Words can be ambiguous, but symbols are not.
 
-[^2]: This concludes the easy part! If I were a student, I'd be worried about plagiarism because I'm almost quoting the paper verbatim so far. Thankfully, we don't have to be so rigorous here.
+[^2]: Dijkstra uses the term `nr.i` to refer to machine `i`, but that doesn't look good and is even a little confusing in LaTeX.
 
-[^3]: "Neither the algorithm nor its variations are the point of the note, which is about the derivation strategy, which worked again."
+[^3]: This concludes the easy part! If I were a student, I'd be worried about plagiarism because I'm almost quoting the paper verbatim so far. Thankfully, we don't have to be so rigorous here.
 
-[^4]: EWD998 references [EWD840](https://www.cs.utexas.edu/users/EWD/ewd08xx/EWD840.PDF), which solves a similar problem with the assumption of instantaneous message delivery. EWD840 feels a bit more accessible - maybe because I read (\*cough\* skimmed) it after EWD998, but it also seems to contain a bit more color on why certain steps are taken.
+[^4]: "Neither the algorithm nor its variations are the point of the note, which is about the derivation strategy, which worked again."
 
-[^5]: Dijkstra uses $\underline{A}$, $\underline{S}$, and $\underline{E}$ for $\forall$ (for all), $\Sigma$ (sum), and $\exists$ (exists), respectively. I'll use the math symbols since they're more familiar to me. All ranges are over integers, so $[0, 5) = \\{ 0, 1, 2, 3, 4 \\}$.
+[^5]: EWD998 references [EWD840](https://www.cs.utexas.edu/users/EWD/ewd08xx/EWD840.PDF), which solves a similar problem with the assumption of instantaneous message delivery. EWD840 feels a bit more accessible - maybe because I read (\*cough\* skimmed) it after EWD998, but it also seems to contain a bit more color on why certain steps are taken.
 
-[^6]: Dijkstra remarks that because the value of $B$ changes in a distributed fashion (i.e. based on the individual sending/receiving actions of each machine), our only option to compute $B$ is to try to compute it in a distributed fashion too. Sounds reasonable to me!
+[^6]: Dijkstra uses $\underline{A}$, $\underline{S}$, and $\underline{E}$ for $\forall$ (for all), $\Sigma$ (sum), and $\exists$ (exists), respectively. I'll use the math symbols since they're more familiar to me. All ranges are over integers, so $[0, 5) = \\{ 0, 1, 2, 3, 4 \\}$.
 
-[^7]: This explains why Dijkstra's previous solution in EWD840 only uses a colored token. In that scenario, messages are delivered instantaneously, so we don't have to worry about keeping track of how many messages are in-flight. This also suggests that an integer-valued token (as well as formulation of the problem) was Shmuel Safra's key contribution.
+[^7]: Dijkstra remarks that because the value of $B$ changes in a distributed fashion (i.e. based on the individual sending/receiving actions of each machine), our only option to compute $B$ is to try to compute it in a distributed fashion too. Sounds reasonable to me!
 
-[^8]: "Eventually" is doing a lot of work for us here! As Markus clarified, this derivation only ensures that the rules for system operation and termination detection are guaranteed to be correct. No statements are made about non-correctness properties (e.g. efficiency - whether there are opportunities to reduce the lag between termination and detection). Similarly, the spec constructed in the workshop only satisfies safety and liveness; that is, it shows that the algorithm eventually detects termination if the system terminates, and termination is correctly detected. It turns out that [TLA+ can also be used to study non-correctness properties](https://github.com/tlaplus/Examples/tree/master/specifications/ewd998#statistics) too!
+[^8]: This explains why Dijkstra's previous solution in EWD840 only uses a colored token. In that scenario, messages are delivered instantaneously, so we don't have to worry about keeping track of how many messages are in-flight. This also suggests that an integer-valued token (as well as formulation of the problem) was Shmuel Safra's key contribution.
+
+[^9]: "Eventually" is doing a lot of work for us here! As Markus clarified, this derivation only ensures that the rules for system operation and termination detection are guaranteed to be correct. No statements are made about non-correctness properties (e.g. efficiency - whether there are opportunities to reduce the lag between termination and detection). Similarly, the spec constructed in the workshop only satisfies safety and liveness; that is, it shows that the algorithm eventually detects termination if the system terminates, and termination is correctly detected. It turns out that [TLA+ can also be used to study non-correctness properties](https://github.com/tlaplus/Examples/tree/master/specifications/ewd998#statistics) too!
