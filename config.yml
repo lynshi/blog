@@ -8,8 +8,6 @@ buildDrafts: false
 buildFuture: false
 buildExpired: false
 
-googleAnalytics: UA-123-45
-
 # Sets up search...?
 # https://adityatelange.github.io/hugo-PaperMod/posts/papermod/papermod-features/#search-page
 outputs:
