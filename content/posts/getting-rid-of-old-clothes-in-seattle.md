@@ -1,5 +1,6 @@
 ---
 title: "Getting Rid of Old Clothes in Seattle"
+description: "Donating and recycling used clothing shouldn't be hard!"
 date: 2023-07-22T23:51:51-07:00
 categories:
   - Lifestyle
