@@ -37,7 +37,7 @@ minify:
 params:
   env: production # to enable google analytics, opengraph, twitter-cards and schema.
   title: "Nibbles and Bytes"
-  description: "Tech tidbits produced at my whim."
+  description: "Lyndon Shi's blog :)"
   keywords: [Blog, Lyndon Shi]
   author: "Lyndon Shi"
   images: [] # "<link or path of image for opengraph, twitter-cards>"
