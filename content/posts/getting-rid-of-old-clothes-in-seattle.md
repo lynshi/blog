@@ -60,7 +60,7 @@ Since we only had adult clothing, we didn't donate to any of these places but th
 ## The Recology Store
 Recology is a company [contracted for solid-waste collection in Seattle](https://www.seattletimes.com/seattle-news/politics/seattle-to-ink-850m-in-new-trash-collection-contracts/). For some reason, they also operate [stores](https://www.recology.com/recology-king-county/seattle/recology-store/) in King County where they sell products that promote a zero-waste lifestyle.
 
-While I don't know how I feel about buying products from a waste management company, the nice thing about the Recology Stores is that they [accept hard-to-recycle items](https://www.recology.com/wp-content/uploads/2022/08/RKC_RecologyStores_Updated_Flyer_ForWeb.pdf) and only charge a fee for non-customers[^2]. Besides clothing, I was happy to find that they accept Styrofoam - we've been driving all the way down to [Styro Recycle](https://styrorecycle.com/) in Kent to recycle that[^3]!
+While I don't know how I feel about buying products from a waste management company, the nice thing about the Recology Stores is that they [accept hard-to-recycle items](https://www.recology.com/wp-content/uploads/2022/08/RKC_RecologyStores_Updated_Flyer_ForWeb.pdf) and only charge a fee for non-customers[^2]. Besides clothing, I was happy to find that they accept Styrofoam — we've been driving all the way down to [Styro Recycle](https://styrorecycle.com/) in Kent to recycle that[^3]!
 
 Unfortunately, I couldn't find any specific information about Recology's recycling process for textiles, but I would hope that a literal waste management company is processing them correctly!
 
