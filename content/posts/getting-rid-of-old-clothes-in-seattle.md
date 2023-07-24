@@ -69,6 +69,6 @@ Unfortunately, I couldn't find any specific information about Recology's recycli
 
 [^1]: Used clothing sent abroad, ostensibly to support local sellers and provide affordable clothing, can [negatively impact local clothing industries](https://link.springer.com/chapter/10.1007/978-3-031-28839-5_108#Sec3) or [end up in landfills anyway](https://gizmodo.com/clothing-pile-chile-atacama-desert-satellite-image-1850443019).
 
-[^2]: You can check Seattle's [Solid Waste Collection Contracts](https://www.seattle.gov/utilities/about/contracts) to see if you're a Recology or Waste Management customer. That said, they didn't ask for my address specifically, so I don't know if they are super strict about which service area you fall into as long as you're in Seattle.
+[^2]: You can check Seattle's [Solid Waste Collection Contracts](https://www.seattle.gov/utilities/about/contracts) to see if you're a Recology or Waste Management customer. That said, they didn't ask for my address, so I don't know if they are super strict about which service area you fall into as long as you're in Seattle.
 
 [^3]: We might keep doing that anyway since (in my humble opinion) [Washington's best bubble tea is in Kent](https://missbobakent.com/).
