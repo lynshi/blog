@@ -26,7 +26,9 @@ An [Azure service principal](https://docs.microsoft.com/en-us/cli/azure/create-a
 
 To create a new service principal, enter the following command in your terminal, making sure to copy the correct`<subscription_id>` and `<resource_group_name>` from your Azure portal.
 
-az ad sp create-for-rbac -n "<name\_of\_service\_principal>" --role "CDN Endpoint Contributor" --sdk-auth --scopes /subscriptions/<subscription\_id>/resourceGroups/<resource\_group\_name>
+```bash
+az ad sp create-for-rbac -n "$nameOfServicePrincipal" --role "CDN Endpoint Contributor" --sdk-auth --scopes "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup"
+```
 
 The output will look similar to the following; be sure to copy and save it somewhere safe, as you will not be able to retrieve the `clientSecret` in the future.
 
@@ -41,7 +43,9 @@ The output will look similar to the following; be sure to copy and save it somew
 
 In the [command](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest#az-ad-sp-create), we are creating a service principal and assigning it a role of “CDN Endpoint Contributor”. This allows the service principal to manage CDN endpoints. The `--sdk-auth` flag causes the output to be correctly formatted for use in the GitHub Action; without it, you will get the following error when you copy the output to GitHub.
 
+```
 Error: Not all values are present in the creds object. Ensure clientId, clientSecret, tenantId and subscriptionId are supplied.
+```
 
 #### Adding GitHub Secrets
 
