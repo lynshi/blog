@@ -14,6 +14,8 @@ tags:
   - Website
 ---
 
+> Originally published on [Medium](https://medium.com/@shilyndon/purging-azure-cdn-with-github-actions-1c18e2adaf18).
+
 When you use Azure CDN to deliver content, you may need to purge your endpoint so that changes you make are sent to your users, as [files are cached in the Azure CDN until their time-to-live (TTL) expires](https://docs.microsoft.com/en-us/azure/cdn/cdn-manage-expiration-of-cloud-service-content). If you don’t set a TTL for your files, Azure automatically sets a TTL of 7 days. Even if you set a lower TTL, your updates may not coincide with the cache expiration.
 
 For example, my personal website uses Azure CDN and is updated on every push I make to GitHub. It’s tough to set a good caching rule for this because my changes are unpredictable. When I’m working on my site, I might push several times a day, but I can also go weeks without modifying my website.

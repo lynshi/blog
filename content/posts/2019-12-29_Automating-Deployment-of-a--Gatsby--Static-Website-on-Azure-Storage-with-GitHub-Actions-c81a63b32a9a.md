@@ -17,6 +17,8 @@ tags:
   - Website
 ---
 
+> Originally published on [Medium](https://medium.com/@shilyndon/automating-deployment-of-a-gatsby-static-website-on-azure-storage-with-github-actions-c81a63b32a9a).
+
 ![](/img/medium/1__HbQtNXVua60jpqXmAgM4Xg.png)
 
 I host my own static website on Azure Storage, and I got tired of running a script to upload my content every time I made a change to my website. After some Googling, I discovered [GitHub Actions](https://github.blog/2019-08-08-github-actions-now-supports-ci-cd/), made public about a month ago, which lets users automate how they build, test, and deploy their projects. Interestingly, though I found great guides for [automating static website deployment to Azure using GitLab](https://medium.com/faun/automating-your-deployment-using-gitlab-azure-storage-static-website-hosting-75c767b2569f) and [building and deploying Gatsby sites with GitHub Actions](https://nehalist.io/building-and-deploying-gatsby-sites-with-github-actions/), there wasn’t one guide with everything I needed, and I had to cobble pieces together from different sources. This is an attempt to rectify that.
