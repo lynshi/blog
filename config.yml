@@ -1,4 +1,4 @@
-baseURL: 'http://lynshi.github.io/'
+baseURL: 'https://lynshi.github.io/'
 title: "Nibbles and Bytes"
 paginate: 5
 theme: PaperMod
