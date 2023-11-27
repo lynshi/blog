@@ -10,3 +10,6 @@ Check it out at [lynshi.github.io](https://lynshi.github.io/)!
 1. [Install Hugo](https://gohugo.io/installation/).
 2. Clone the repo with `git clone --recurse-submodules` to fetch submodules (e.g. required for the theme).
 3. `hugo serve --buildDrafts` to run the site with live reloading.
+
+# Adding a post
+`hugo new content content/posts/${POST_NAME}.md`
