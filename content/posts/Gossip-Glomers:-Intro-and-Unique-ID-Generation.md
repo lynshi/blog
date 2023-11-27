@@ -16,7 +16,7 @@ One of the challenges for practicing implementation distributed systems is that 
 
 Fortunately, I recently came across a series of distributed systems challenges created by [fly.io](https://fly.io/) and [Kyle Kingsbury](https://aphyr.com/about) (author of [Jepsen](https://jepsen.io/)): [Gossip Glomers](https://fly.io/dist-sys/). The challenges use [`Maelstrom`](https://github.com/jepsen-io/maelstrom), a framework for running and testing toy implementations of distributed systems, so that you only have to implement the individual nodes and not worry about anything else. Even better, Maelstrom provides a [Go library](https://pkg.go.dev/github.com/jepsen-io/maelstrom/demo/go) containing the boilerplate for creating Maelstrom Nodes, leaving you to focus on the fun stuff!
 
-All the challenges can be found at the [Gossip Glomers](https://fly.io/dist-sys/) site. I'll be working through it as I get time; as I complete them, I'll also write a post about my thought process[^1]! My code can be found at [https://github.com/lynshi/gossip-glomers](https://github.com/lynshi/gossip-glomers).
+With this being so accessible, I guess I'll be working through the Gossip Glomers as I get time. As I complete challenges, I'll also write a post about my thought process[^1]! My code can be found at [https://github.com/lynshi/gossip-glomers](https://github.com/lynshi/gossip-glomers).
 
 <!--- Footnotes -->
 
