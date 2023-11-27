@@ -43,7 +43,7 @@ Since the test sends 1000 requests per second for 30 seconds, the system is expe
 ---
 ## Implementation
 
-Naively, the way to create locally unique IDs is to have a counter start at 0. Every time a `generate` message is received, we return the current counter value and increment the counter.
+Naively, the way to create locally unique IDs is to have a counter that starts at 0. Every time a `generate` message is received, we return the current counter value and increment the counter.
 
 There is a small issue — presumably, a node can receive concurrent requests. There needs to be a synchronization primitive for the counter to ensure that each counter value is only read once. Normally we would use a lock to protect access, but we are using Go so let's do better!
 
@@ -68,7 +68,7 @@ go func() {
 }()
 ```
 
-With a channel providing unique IDs now available, the `unique_ids` handler only needs to read a value from the channel to respond to a request. Note the need to prefix the read ID with the node ID, which we do by shifting the node ID left 15 bits.
+With a channel providing unique IDs now available, the `unique_ids` handler only needs to read a value from the channel to respond to a request. Recall the need to prefix the read ID with the node ID, which we do by shifting the node ID left 15 bits.
 ```go
 node_id, err := strconv.Atoi(n.ID()[1:])
 if err != nil {
