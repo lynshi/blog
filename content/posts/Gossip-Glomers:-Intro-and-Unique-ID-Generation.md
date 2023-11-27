@@ -9,7 +9,6 @@ tags:
   - Distributed systems
   - fly.io
   - Gossip Glomers
-draft: true
 ---
 
 One of the challenges for practicing implementing distributed systems is that it is not easy to simulate the various situations a distributed system might find itself in. Moreover, I previously could not even come up with an easy way to deploy a toy setup; the only thing I could think of is to use [minikube](https://minikube.sigs.k8s.io/docs/) and build a Kubernetes-based environment, but frankly at that point it is too much investment for me[^0].
