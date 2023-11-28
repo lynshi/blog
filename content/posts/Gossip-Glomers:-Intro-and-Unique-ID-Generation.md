@@ -18,12 +18,8 @@ Fortunately, I recently came across a series of distributed systems challenges c
 With this being so accessible, I guess I'll be working through the Gossip Glomers as I get time. When I complete a challenge, I'll also write a post about my thought process[^2]!
 
 ---
-# Repository Structure
-My code can be found on GitHub at [lynshi/gossip-glomers](https://github.com/lynshi/gossip-glomers). Handlers are registered in [main.go](https://github.com/lynshi/gossip-glomers/blob/main/main.go), while implementations for each challenge can be found under [`internal/`](https://github.com/lynshi/gossip-glomers/tree/main/internal). Each package exposes `Add*Handle` methods to add handlers for different (Maelstrom-defined) message types.
-
-Throughout the challenges, I make use of channels[^5]. Though this doesn't seem strictly necessary for such a toy program, I use [`Context`](https://pkg.go.dev/context) to inform goroutines when the program is shutting down so that they can close channels before exiting.
-
-Finally, I've set up [GitHub Actions](https://github.com/lynshi/gossip-glomers/blob/main/.github/workflows/tests.yml) to run tests for each challenge.
+# Repository Notes
+My code can be found on GitHub at [lynshi/gossip-glomers](https://github.com/lynshi/gossip-glomers). Implementations for each challenge can be found under [`internal/`](https://github.com/lynshi/gossip-glomers/tree/main/internal). Finally, I've set up [GitHub Actions](https://github.com/lynshi/gossip-glomers/blob/main/.github/workflows/tests.yml) to run tests for each challenge.
 
 ---
 # Challenge 2: Unique ID Generation
