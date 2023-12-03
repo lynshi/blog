@@ -29,66 +29,145 @@ We start off implementing only one node to ensure that we receive and save broad
 
 To store values, we'll use an array of integers. Since we may have multiple handlers running concurrently, we'll use a channel to synchronize access. This channel will have a buffer size of 1, and we'll initialize it with an empty integer array. To add to the array, the `broadcast` handler will read the array to consume the single copy, append to it, and write it back to the channel. Similarly, the `read` handler will read the array from the channel and return a copy in the response.
 
-```go
-var messages chan []int
+In order to make it easy to have a distinct implementation for each part, we'll wrap the data structures used in a struct. For example, for Part A we'll define `SingleNodeNode`.
 
-func AddSingleNodeBroadcastHandle(ctx context.Context, n *maelstrom.Node) {
+```go
+type SingleNodeNode struct {
+	mn *maelstrom.Node
+
+	messages chan []int
+}
+
+func NewSingleNodeNode(ctx context.Context, n *maelstrom.Node) {
   messages = make(chan []int, 1)
   messages <- make([]int, 0, 1)
+
+  n := SingleNodeNode{
+		mn:       mn,
+		messages: messages,
+	}
+
+	go func() {
+		<-ctx.Done()
+		close(messages)
+	}()
+
+	n.addBroadcastHandle()
+	n.addReadHandle()
+	n.addTopologyHandle()
+
+	return &n
 }
 ```
 
 ```go
-broadcast := func(req maelstrom.Message) error {
-  var body map[string]any
-  if err := json.Unmarshal(req.Body, &body); err != nil {
-    return err
-  }
+func (n *SingleNodeNode) broadcastSingleNodeBuilder() maelstrom.HandlerFunc {
+  broadcast := func(req maelstrom.Message) error {
+		// ...
 
-  message, _ := getMessage(body)
+		message, _ := getMessage(body)
 
-  msgs := <-messages
-  msgs = append(msgs, int(message))
-  messages <- msgs
+		msgs := <-n.messages
+		msgs = append(msgs, int(message))
+		n.messages <- msgs
+
+		// ...
+	}
+
+	return broadcast
 }
 ```
 
 ```go
-read := func(req maelstrom.Message) error {
-  msgs := <-messages
-  // Now that we have a local copy, we can immediately return it to the channel so that other
-  // goroutines are unblocked.
-  messages <- msgs
+func (n *SingleNodeNode) readBuilder() maelstrom.HandlerFunc {
+	read := func(req maelstrom.Message) error {
+		msgs := <-n.messages
+		// Now that we have a local copy, we can immediately return it to the channel so that other
+		// goroutines are unblocked.
+		n.messages <- msgs
 
-  resp := make(map[string]any)
-  resp["type"] = "read_ok"
-  resp["messages"] = msgs
+		// ...
+	}
 
-  return n.Reply(req, resp)
+	return read
 }
 ```
 
 My code for Part A is at [`internal/broadcast/3a.go`](https://github.com/lynshi/gossip-glomers/blob/main/internal/broadcast/3a.go).
 
 ## A note on topology
-The `topology` message type is odd. The problem statement says that we can ignore the provided neighbors and build our own topology from Maelstrom's list of all nodes, as all nodes can communicate with each other. At first, I was confused about this as there doesn't seem to be a point of this message then, and based on a glance at [`community.fly.io`](https://community.fly.io/tag/dist-sys-challenge) I wasn't the only one[^1]. However, someone explained that ["the topology is just a way to logically arrange nodes" and that Maelstrom allows you to select a topology](https://community.fly.io/t/using-a-own-topology/11057/6), so my conclusion is that the topology can be interpreted as a recommendation for inter-node communication[^2] and also provides consistency with Maelstrom's problem formulation, which causes the Maelstrom controller to send a `topology` message when starting up the nodes. Ultimately, I chose to ignore this message for all sections of this challenge as I constructed my own topology later on.
+The `topology` message type is odd. The problem statement says that we can ignore the provided neighbors and build our own topology from Maelstrom's list of all nodes, as all nodes can communicate with each other. At first, I was confused about this as there doesn't seem to be a point of this message then, and based on a glance at [community.fly.io](https://community.fly.io/tag/dist-sys-challenge) I wasn't the only one[^1]. However, someone explained that ["the topology is just a way to logically arrange nodes" and that Maelstrom allows you to select a topology](https://community.fly.io/t/using-a-own-topology/11057/6), so my conclusion is that the topology can be interpreted as a recommendation for inter-node communication[^2] and also provides consistency with Maelstrom's problem formulation, which causes the Maelstrom controller to send a `topology` message when starting up the nodes. Ultimately, I chose to ignore this message for all sections of this challenge as I constructed my own topology later on.
 
 ---
 
 # 3b: Multi-Node Broadcast
-In Part B, we introduce multiple nodes, and upon receiving a `broadcast` message a node must distribute that message to all other nodes within a few seconds. Because all messages are unique, I decided to store the messages in a `map[int]interface{}` instead so that saved messages are automatically deduplicated [^3].
-
-As the problem is getting more complicated, I also introduced a `MultiNodeNode` type to encapsulate the implementation for Part B. This also helps me easily write distinct implementations for each section so that I can link to standalone files for the blog 😆.
+In Part B, we introduce multiple nodes, and upon receiving a `broadcast` message a node must distribute that message to all other nodes within a few seconds. Because all messages are unique, I decided to store the messages in a `map[int]interface{}` instead so that saved messages are automatically deduplicated [^3]. As before, we initialize a `MultiNodeNode` by adding an empty map to the `messages` channel.
 
 ```go
 type MultiNodeNode struct {
 	mn *maelstrom.Node
 
-	// Keeps track of received messages.
 	messages chan map[int]interface{}
+}
 
-	// Queues up messages yet to be sent to other nodes.
-	queue chan int
+func NewMultiNodeNode(ctx context.Context, mn *maelstrom.Node) *MultiNodeNode {
+	messages := make(chan map[int]interface{}, 1)
+	messages <- make(map[int]interface{})
+
+	n := &MultiNodeNode{
+		mn:       mn,
+		messages: messages,
+	}
+
+  // ...
+  return &n
+}
+```
+
+Since we have to forward messages received from the controller to other nodes as soon as possible, upon receipt of a `broadcast` message that did not originate from another node, the node initiates a goroutine to send the message to every other node. We use the Maelstrom-provided method `Send`, which is a fire-and-forget method that sends a message to the specified destination.
+
+```go
+broadcast := func(req maelstrom.Message) error {
+  // ...
+
+  if !strings.HasPrefix(req.Src, "n") {
+    go func() {
+      for _, neighbor := range n.mn.NodeIDs() {
+        req := make(map[string]any)
+        req["type"] = "broadcast"
+        req["message"] = message
+
+        go n.mn.Send(neighbor, req)
+      }
+    }()
+
+    resp := make(map[string]any)
+    resp["type"] = "broadcast_ok"
+
+    return n.mn.Reply(req, resp)
+  }
+
+  // ...
+}
+```
+
+The `read` handler is very similar to before, except we now must convert the map into an array.
+```go
+read := func(req maelstrom.Message) error {
+  messages := <-n.messages
+  n.messages <- messages
+
+  resp := make(map[string]any)
+  resp["type"] = "read_ok"
+  resp_messages := make([]int, 0, len(messages))
+
+  for v, _ := range messages {
+    resp_messages = append(resp_messages, v)
+  }
+
+  resp["messages"] = resp_messages
+
+  return n.mn.Reply(req, resp)
 }
 ```
 
