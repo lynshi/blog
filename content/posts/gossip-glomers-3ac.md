@@ -27,15 +27,15 @@ We start off implementing only one node to ensure that we receive and save broad
 * `read`: Return all values received by the node.
 * `topology`: Receive information about neighbors.
 
-To store values, we'll use an array of integers. Since we may have multiple handlers running concurrently, we'll use a channel to synchronize access. This channel will have a buffer size of 1, and we'll initialize it with an empty integer array. To add to the array, the `broadcast` handler will read the array to consume the single copy, append to it, and write it back to the channel. Similarly, the `read` handler will read the array from the channel and return a copy in the response.
+To store values, we'll use an array of integers. Since we may have multiple handlers running concurrently, we'll use a channel to synchronize access. This channel will have a buffer size of 1 and we'll initialize it with an empty integer array. To add to the array, the `broadcast` handler will read the array to consume the single copy, append to it, and write it back to the channel. Similarly, the `read` handler will read the array from the channel and return a copy in the response.
 
 In order to make it easy to have a distinct implementation for each part, we'll wrap the data structures used in a struct. For example, for Part A we'll define `SingleNodeNode`.
 
 ```go
 type SingleNodeNode struct {
-	mn *maelstrom.Node
+  mn *maelstrom.Node
 
-	messages chan []int
+  messages chan []int
 }
 
 func NewSingleNodeNode(ctx context.Context, n *maelstrom.Node) {
@@ -43,7 +43,7 @@ func NewSingleNodeNode(ctx context.Context, n *maelstrom.Node) {
   messages <- make([]int, 0, 1)
 
   n := SingleNodeNode{
-		mn:       mn,
+    mn:       mn,
 		messages: messages,
 	}
 
@@ -234,7 +234,7 @@ broadcast := func(req maelstrom.Message) error {
 My code for Part C is in [`internal/broadcast/3c.go`](https://github.com/lynshi/gossip-glomers/blob/main/internal/broadcast/3c.go).
 
 <!--- Footnotes -->
-[^0]: Note that nodes never crash, so we don't have to worry about persisting data to disk.
+[^0]: Note that nodes never crash so we don't have to worry about persisting data to disk.
 [^1]: [maelstrom challenge: request to implement topology and then ignore it is very confusing.](https://community.fly.io/t/maelstrom-challenge-request-to-implement-topology-and-then-ignore-it-is-very-confusing/11337)
 [^2]: This is relevant for later challenges, where efficiency requirements mean you can't have a node talk to every other node.
 [^3]: Go doesn't have sets, so a `map[int]interface{}` is a workaround for creating a set of integers as the value in each key-value pair is ignored and usually set to `nil`.
