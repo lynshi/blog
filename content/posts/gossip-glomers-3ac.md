@@ -101,7 +101,7 @@ The `topology` message type is odd. The problem statement says that we can ignor
 ---
 
 # 3b: Multi-Node Broadcast
-In Part B, we introduce multiple nodes, and upon receiving a `broadcast` message a node must distribute that message to all other nodes within a few seconds. Because all messages are unique, I decided to store the messages in a `map[int]interface{}` instead so that saved messages are automatically deduplicated [^3]. As before, we initialize a `MultiNodeNode` by adding an empty map to the `messages` channel.
+In [Part B](https://fly.io/dist-sys/3b/), we introduce multiple nodes, and upon receiving a `broadcast` message a node must distribute that message to all other nodes within a few seconds. Because all messages are unique, I decided to store the messages in a `map[int]interface{}` instead so that saved messages are automatically deduplicated [^3]. As before, we initialize a `MultiNodeNode` by adding an empty map to the `messages` channel.
 
 ```go
 type MultiNodeNode struct {
@@ -172,8 +172,70 @@ read := func(req maelstrom.Message) error {
 }
 ```
 
+The full code for Part B is at [`internal/broadcast/3b.go`](https://github.com/lynshi/gossip-glomers/blob/main/internal/broadcast/3b.go).
+
+---
+
+# 3c: Fault Tolerant Broadcast
+[Part C](https://fly.io/dist-sys/3c/) introduces network partitions to temporarily prevent inter-node communication. To accommodate, we use `RPC` instead of `Send`, as `RPC` checks for a successful response. `RPC` takes a callback handler, which we use to set a local `success` variable to `true` to prevent further retries[^4]. Otherwise, the network call is retried.
+
+To reduce latency, we'll have every node forward received `broadcast` messages even if they weren't the first node to get it. This means we can detour around partitions when possible at the cost of message duplication. Of course, if a node finds that it has already received the message, we skip forwarding as it must have already done so earlier; this avoids infinite forwarding cycles. This resulted in tiny latencies (milliseconds): `:stable-latencies {0 0, 0.5 0, 0.95 0, 0.99 3, 1 3}`. Without this optimization - that is, only the first node forwards - the latency was `:stable-latencies {0 0, 0.5 1022, 0.95 10504, 0.99 11563, 1 12205}`.
+
+```go
+func (n *FaultTolerantNode) forward_to_all(message int) {
+	for _, neighbor := range n.mn.NodeIDs() {
+		if neighbor == n.mn.ID() {
+			continue
+		}
+
+		req := make(map[string]any)
+		req["type"] = "broadcast"
+		req["message"] = message
+
+		go n.forward(neighbor, req)
+	}
+}
+
+func (n *FaultTolerantNode) forward(neighbor string, body map[string]any) {
+	for {
+		success := false
+		err := n.mn.RPC(neighbor, body, func(resp maelstrom.Message) error {
+			success = true
+			return nil
+		})
+		if err == nil && success {
+			return
+		}
+
+		// Let's not bother with fancy backoffs since we know the partition
+		// heals eventually.
+		time.Sleep(500 * time.Millisecond)
+	}
+}
+```
+
+```go
+broadcast := func(req maelstrom.Message) error {
+  // ...
+
+  messages := <-n.messages
+  _, val_exists := messages[message]
+  messages[message] = nil
+  n.messages <- messages
+
+  if !val_exists {
+    go n.forward_to_all(message)
+  }
+
+  // ...
+}
+```
+
+My code for Part C is in [`internal/broadcast/3c.go`](https://github.com/lynshi/gossip-glomers/blob/main/internal/broadcast/3c.go).
+
 <!--- Footnotes -->
 [^0]: Note that nodes never crash, so we don't have to worry about persisting data to disk.
 [^1]: [maelstrom challenge: request to implement topology and then ignore it is very confusing.](https://community.fly.io/t/maelstrom-challenge-request-to-implement-topology-and-then-ignore-it-is-very-confusing/11337)
 [^2]: This is relevant for later challenges, where efficiency requirements mean you can't have a node talk to every other node.
 [^3]: Go doesn't have sets, so a `map[int]interface{}` is a workaround for creating a set of integers as the value in each key-value pair is ignored and usually set to `nil`.
+[^4]: I didn't look at the documentation, but from brief experimentation I hypothesize that `Send` and `RPC` only return errors if there was an issue sending the message (which is probably rare). However, `Send` doesn't guarantee receipt, while `RPC` will call the callback handler once the message is received, even if the recipient node doesn't actually reply with anything.
