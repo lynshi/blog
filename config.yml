@@ -44,7 +44,7 @@ params:
   disableThemeToggle: false
 
   ShowReadingTime: true
-  ShowShareButtons: true
+  ShowShareButtons: false
   ShareButtons: ["linkedin", "twitter", "reddit"] # To customize which share buttons to be enabled on page
   ShowPostNavLinks: true
   ShowBreadCrumbs: true
