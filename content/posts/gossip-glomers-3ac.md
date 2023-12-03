@@ -68,10 +68,32 @@ read := func(req maelstrom.Message) error {
 }
 ```
 
-## topology
+My code for Part A is at [`internal/broadcast/3a.go`](https://github.com/lynshi/gossip-glomers/blob/main/internal/broadcast/3a.go).
+
+## A note on topology
 The `topology` message type is odd. The problem statement says that we can ignore the provided neighbors and build our own topology from Maelstrom's list of all nodes, as all nodes can communicate with each other. At first, I was confused about this as there doesn't seem to be a point of this message then, and based on a glance at [`community.fly.io`](https://community.fly.io/tag/dist-sys-challenge) I wasn't the only one[^1]. However, someone explained that ["the topology is just a way to logically arrange nodes" and that Maelstrom allows you to select a topology](https://community.fly.io/t/using-a-own-topology/11057/6), so my conclusion is that the topology can be interpreted as a recommendation for inter-node communication[^2] and also provides consistency with Maelstrom's problem formulation, which causes the Maelstrom controller to send a `topology` message when starting up the nodes. Ultimately, I chose to ignore this message for all sections of this challenge as I constructed my own topology later on.
+
+---
+
+# 3b: Multi-Node Broadcast
+In Part B, we introduce multiple nodes, and upon receiving a `broadcast` message a node must distribute that message to all other nodes within a few seconds. Because all messages are unique, I decided to store the messages in a `map[int]interface{}` instead so that saved messages are automatically deduplicated [^3].
+
+As the problem is getting more complicated, I also introduced a `MultiNodeNode` type to encapsulate the implementation for Part B. This also helps me easily write distinct implementations for each section so that I can link to standalone files for the blog 😆.
+
+```go
+type MultiNodeNode struct {
+	mn *maelstrom.Node
+
+	// Keeps track of received messages.
+	messages chan map[int]interface{}
+
+	// Queues up messages yet to be sent to other nodes.
+	queue chan int
+}
+```
 
 <!--- Footnotes -->
 [^0]: Note that nodes never crash, so we don't have to worry about persisting data to disk.
 [^1]: [maelstrom challenge: request to implement topology and then ignore it is very confusing.](https://community.fly.io/t/maelstrom-challenge-request-to-implement-topology-and-then-ignore-it-is-very-confusing/11337)
 [^2]: This is relevant for later challenges, where efficiency requirements mean you can't have a node talk to every other node.
+[^3]: Go doesn't have sets, so a `map[int]interface{}` is a workaround for creating a set of integers as the value in each key-value pair is ignored and usually set to `nil`.
