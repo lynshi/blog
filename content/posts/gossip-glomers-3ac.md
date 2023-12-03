@@ -124,30 +124,31 @@ func NewMultiNodeNode(ctx context.Context, mn *maelstrom.Node) *MultiNodeNode {
 }
 ```
 
-Since we have to forward messages received from the controller to other nodes as soon as possible, upon receipt of a `broadcast` message that did not originate from another node, the node initiates a goroutine to send the message to every other node. We use the Maelstrom-provided method `Send`, which is a fire-and-forget method that sends a message to the specified destination.
+Since we have to forward messages received from the controller to other nodes as soon as possible, upon receipt of a `broadcast` message that did not originate from another node, the node initiates a goroutine to send the message to every other node. We use the Maelstrom-provided method `Send`, which is a fire-and-forget method that sends a message to the specified destination, as there aren't network failures in this scenario.
 
 ```go
 broadcast := func(req maelstrom.Message) error {
   // ...
 
-  if !strings.HasPrefix(req.Src, "n") {
-    go func() {
-      for _, neighbor := range n.mn.NodeIDs() {
-        req := make(map[string]any)
-        req["type"] = "broadcast"
-        req["message"] = message
-
-        go n.mn.Send(neighbor, req)
-      }
-    }()
-
-    resp := make(map[string]any)
-    resp["type"] = "broadcast_ok"
-
-    return n.mn.Reply(req, resp)
+  // Only forward if the message did not come from another node.
+  if strings.HasPrefix(req.Src, "n") {
+    return nil
   }
 
-  // ...
+  go func() {
+    for _, neighbor := range n.mn.NodeIDs() {
+      req := make(map[string]any)
+      req["type"] = "broadcast"
+      req["message"] = message
+
+      go n.mn.Send(neighbor, req)
+    }
+  }()
+
+  resp := make(map[string]any)
+  resp["type"] = "broadcast_ok"
+
+  return n.mn.Reply(req, resp)
 }
 ```
 
