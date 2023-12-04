@@ -44,52 +44,52 @@ func NewSingleNodeNode(ctx context.Context, n *maelstrom.Node) {
 
   n := SingleNodeNode{
     mn:       mn,
-		messages: messages,
-	}
+    messages: messages,
+  }
 
-	go func() {
-		<-ctx.Done()
-		close(messages)
-	}()
+  go func() {
+    <-ctx.Done()
+    close(messages)
+  }()
 
-	n.addBroadcastHandle()
-	n.addReadHandle()
-	n.addTopologyHandle()
+  n.addBroadcastHandle()
+  n.addReadHandle()
+  n.addTopologyHandle()
 
-	return &n
+  return &n
 }
 ```
 
 ```go
 func (n *SingleNodeNode) broadcastSingleNodeBuilder() maelstrom.HandlerFunc {
   broadcast := func(req maelstrom.Message) error {
-		// ...
+    // ...
 
-		message, _ := getMessage(body)
+    message, _ := getMessage(body)
 
-		msgs := <-n.messages
-		msgs = append(msgs, int(message))
-		n.messages <- msgs
+    msgs := <-n.messages
+    msgs = append(msgs, int(message))
+    n.messages <- msgs
 
-		// ...
-	}
+    // ...
+  }
 
-	return broadcast
+  return broadcast
 }
 ```
 
 ```go
 func (n *SingleNodeNode) readBuilder() maelstrom.HandlerFunc {
-	read := func(req maelstrom.Message) error {
-		msgs := <-n.messages
-		// Now that we have a local copy, we can immediately return it to the channel so that other
-		// goroutines are unblocked.
-		n.messages <- msgs
+  read := func(req maelstrom.Message) error {
+    msgs := <-n.messages
+    // Now that we have a local copy, we can immediately return it to the channel so that other
+    // goroutines are unblocked.
+    n.messages <- msgs
 
-		// ...
-	}
+    // ...
+  }
 
-	return read
+  return read
 }
 ```
 
@@ -105,19 +105,19 @@ In [Part B](https://fly.io/dist-sys/3b/), we introduce multiple nodes, and upon 
 
 ```go
 type MultiNodeNode struct {
-	mn *maelstrom.Node
+  mn *maelstrom.Node
 
-	messages chan map[int]interface{}
+  messages chan map[int]interface{}
 }
 
 func NewMultiNodeNode(ctx context.Context, mn *maelstrom.Node) *MultiNodeNode {
-	messages := make(chan map[int]interface{}, 1)
-	messages <- make(map[int]interface{})
+  messages := make(chan map[int]interface{}, 1)
+  messages <- make(map[int]interface{})
 
-	n := &MultiNodeNode{
-		mn:       mn,
-		messages: messages,
-	}
+  n := &MultiNodeNode{
+    mn:       mn,
+    messages: messages,
+  }
 
   // ...
   return &n
@@ -183,34 +183,34 @@ To reduce latency, we'll have every node forward received `broadcast` messages e
 
 ```go
 func (n *FaultTolerantNode) forward_to_all(message int) {
-	for _, neighbor := range n.mn.NodeIDs() {
-		if neighbor == n.mn.ID() {
-			continue
-		}
+  for _, neighbor := range n.mn.NodeIDs() {
+    if neighbor == n.mn.ID() {
+      continue
+    }
 
-		req := make(map[string]any)
-		req["type"] = "broadcast"
-		req["message"] = message
+    req := make(map[string]any)
+    req["type"] = "broadcast"
+    req["message"] = message
 
-		go n.forward(neighbor, req)
-	}
+    go n.forward(neighbor, req)
+  }
 }
 
 func (n *FaultTolerantNode) forward(neighbor string, body map[string]any) {
-	for {
-		success := false
-		err := n.mn.RPC(neighbor, body, func(resp maelstrom.Message) error {
-			success = true
-			return nil
-		})
-		if err == nil && success {
-			return
-		}
+  for {
+    success := false
+    err := n.mn.RPC(neighbor, body, func(resp maelstrom.Message) error {
+      success = true
+      return nil
+    })
+    if err == nil && success {
+      return
+    }
 
-		// Let's not bother with fancy backoffs since we know the partition
-		// heals eventually.
-		time.Sleep(500 * time.Millisecond)
-	}
+    // Let's not bother with fancy backoffs since we know the partition
+    // heals eventually.
+    time.Sleep(500 * time.Millisecond)
+  }
 }
 ```
 
