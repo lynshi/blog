@@ -235,7 +235,7 @@ broadcast := func(req maelstrom.Message) error {
 }
 ```
 
-For the complete implementation for Part C, see [`internal/broadcast/3c.go`](https://github.com/lynshi/gossip-glomers/blob/main/internal/broadcast/3c.go).
+For the complete implementation of Part C, see [`internal/broadcast/3c.go`](https://github.com/lynshi/gossip-glomers/blob/main/internal/broadcast/3c.go).
 
 <!--- Footnotes -->
 [^0]: Note that nodes never crash so we don't have to worry about persisting data to disk.
