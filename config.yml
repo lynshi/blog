@@ -91,17 +91,23 @@ params:
     Content: |
       Welcome to my little corner of the Internet :)
 
-      --
+      -
 
       Every once in a while I'll be inspired to write about something I learned and this is where
       that content goes. Hopefully someone out there will learn something new or find a solution to
       their issue here!
+
+      -
+
+      Since Google might not index everything I post, I also publish my guides on Medium so that people can find them.
 
   socialIcons:
     - name: linkedin
       url: "https://www.linkedin.com/in/lynshi/"
     - name: github
       url: "https://github.com/lynshi"
+    - name: medium
+      url: "https://medium.com/@shilyndon"
 
   analytics:
     google:
