@@ -6,7 +6,6 @@ date: 2026-01-17T19:04:10-08:00
 tags:
   - Tauri
   - Svelte
-  - Sortable
 ---
 
 [Sortable](https://github.com/SortableJS/Sortable) is a very nice JavaScript library for making HTML lists sortable via drag-and-drop,
