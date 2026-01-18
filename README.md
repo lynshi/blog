@@ -13,3 +13,6 @@ Check it out at [lynshi.github.io](https://lynshi.github.io/)!
 
 # Creating a new post
 `hugo new posts/${POST_NAME}.md`
+
+# Publishing
+After merging to main, a GitHub Action builds and pushes the built website to [lynshi.github.io](https://github.com/lynshi/lynshi.github.io), where the blog is hosted.
