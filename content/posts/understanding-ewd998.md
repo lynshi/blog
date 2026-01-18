@@ -3,8 +3,6 @@ title: "Understanding EWD998: Shmuel Safra's version of termination detection"
 description: >-
   Oh no, there are math symbols!
 date: 2023-02-18T21:55:07-08:00
-categories:
-  - Academic
 tags:
   - Distributed systems
   - TLA+

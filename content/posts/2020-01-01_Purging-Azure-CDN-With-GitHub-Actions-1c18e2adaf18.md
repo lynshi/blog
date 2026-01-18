@@ -5,8 +5,6 @@ description: >-
   craft caching rules or manually enter the Azure portal.
 date: '2020-01-01T04:13:58.567Z'
 slug: /@shilyndon/purging-azure-cdn-with-github-actions-1c18e2adaf18
-categories:
-  - Deployment
 tags:
   - Microsoft Azure
   - GitHub Actions

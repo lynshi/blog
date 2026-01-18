@@ -1,4 +1,4 @@
-baseURL: 'https://lynshi.github.io/'
+baseURL: "https://lynshi.github.io/"
 title: "Nibbles and Bytes"
 paginate: 5
 theme: PaperMod
@@ -15,13 +15,9 @@ outputs:
     - HTML
     - RSS
     - JSON # is necessary
-  categories:
-    - HTML
-    - RSS
   tags:
     - HTML
     - RSS
-  
 
 outputFormats:
   outputFormats.RSS:
@@ -147,12 +143,9 @@ menu:
     - name: Search
       url: search/
       weight: 10
-    - name: Categories
-      url: categories/
-      weight: 15
     - name: Tags
       url: tags/
-      weight: 20
+      weight: 15
 # Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
 pygmentsUseClasses: true
 markup:
@@ -165,6 +158,5 @@ markup:
     # style: monokai
 
 taxonomies:
-  category: categories
   tag: tags
   series: series
