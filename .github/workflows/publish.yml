@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy:
@@ -14,7 +14,7 @@ jobs:
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
-          hugo-version: '0.110.0'
+          hugo-version: "0.110.0"
           extended: true
       - name: Build
         run: hugo --minify
@@ -22,10 +22,11 @@ jobs:
         id: push_directory
         uses: cpina/github-action-push-to-another-repository@main
         env:
+          # Add the public key as a deploy key in https://github.com/lynshi/lynshi.github.io/settings/keys
           SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
         with:
           source-directory: public/
-          destination-github-username: 'lynshi'
-          destination-repository-name: 'lynshi.github.io'
+          destination-github-username: "lynshi"
+          destination-repository-name: "lynshi.github.io"
           commit-message: See ORIGIN_COMMIT from $GITHUB_REF
           target-branch: main
