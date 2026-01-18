@@ -8,8 +8,6 @@ description: >-
 date: '2019-12-29T19:46:39.239Z'
 slug: >-
   /@shilyndon/automating-deployment-of-a-gatsby-static-website-on-azure-storage-with-github-actions-c81a63b32a9a
-categories:
-  - Deployment
 tags:
   - Gatsby
   - Microsoft Azure

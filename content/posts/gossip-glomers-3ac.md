@@ -3,8 +3,6 @@ title: "Gossip Glomers 3 (a-c): Single-Node, Multi-Node, and Fault Tolerant Broa
 date: 2023-11-29T14:57:01-08:00
 description: >-
   It gets more involved at 3d, so let's talk about a-c first.
-categories:
-  - Academic
 tags:
   - Distributed systems
   - fly.io
