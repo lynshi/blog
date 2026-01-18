@@ -114,7 +114,7 @@ will not display in the correct order.
 From the Svelte side, everything looks great now. In fact, it will work perfectly if you throw it in a REPL[^1],
 which is maddening because locally, in your Tauri app, you will not be able to drag any list items!
 
-This is the first Tauri-introduced issue I encountered. The OS (i.e. Mac) drag-and-drop functionality was preventing the drag-and-drop event  from registering in the webview. To avoid this, I had to add `dragDropEnabled: false` to my `tauri.conf.json`:
+This is the first Tauri-introduced issue I encountered. The application window's drag-and-drop functionality was preventing the drag-and-drop event from registering in the webview. To avoid this, I had to add `dragDropEnabled: false` to my `tauri.conf.json`:
 ```json
 {
     "app": {
