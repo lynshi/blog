@@ -15,7 +15,9 @@ that I've figured it out I might as well collect my findings into the blog post 
 
 It was quite hard to get working for two reasons. First, I'm using [Svelte](https://svelte.dev/) (version 5), which is a UI framework that very
 much wants to solely manage the HTML. Second, I'm using [Tauri](https://tauri.app/) (version 2.0), a framework for building cross-platform 
-applications; this adds complexity beyond a web app. Before getting started, I searched for resources that would tell
+applications; this adds complexity beyond a web app.
+
+Before getting started, I searched for resources that would tell
 me exactly how to integrate all three things together. Sadly, there were none. The closest I got, and what I started with, was this ["Svelte 5 and SortableJS" blog post](https://dev.to/jdgamble555/svelte-5-and-sortablejs-5h6j). Unfortunately, there were still several issues to iron out thanks to the Tauri variable.
 Ultimately, I ended up with an [attachment-based](https://svelte.dev/docs/svelte/@attach) solution for an even more
 \~modern\~ Svelte flavor[^0].
@@ -165,7 +167,7 @@ const sortable = Sortable.create(el, {
 ```
 
 From [Sortable docs](https://github.com/SortableJS/Sortable?tab=readme-ov-file#forcefallback-option), `forceFallback` changes how drag-and-drop
-works to be compatible with non-HTML5 browsers, even on HTML5 browsers. This completely fixes the issue!
+works to be compatible with non-HTML5 browsers, even on HTML5 browsers. Setting this option completely fixes the issue!
 
 Unfortunately, what I can't tell you is why this works, and after bashing my head on this for far too long I lack the inclination to do further 
 research. Amp reported that "HTML5 Drag and Drop has known quirks, especially in Electron-like environments like Tauri", but when
